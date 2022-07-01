@@ -48,7 +48,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: ci-packages-${{ github.sha }}
-          path: pypi
       - run: ls -lh pypi/
 
       - uses: ./.github/actions/pkg-check
@@ -91,7 +90,6 @@ jobs:
         if: ${{ matrix.pkg != '' }}
         with:
           name: ci-packages-${{ github.sha }}
-          path: pypi
       - run: ls -lh pypi/
 
       - uses: ./.github/actions/pkg-check
