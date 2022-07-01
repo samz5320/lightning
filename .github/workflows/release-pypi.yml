@@ -13,26 +13,37 @@ jobs:
   releasing:
     runs-on: ubuntu-20.04
     outputs:
-      pkgs: ${{ steps.candidate.outputs.pkgs }}
+      build-pkgs: ${{ steps.candidate.outputs.pkgs }}
+      pull-pkgs: ${{ steps.download.outputs.pkgs }}
     steps:
     - run: |
         mkdir dist && touch dist/.placeholder
         mkdir pypi && touch pypi/.placeholder
     - uses: actions/upload-artifact@v3
       with:
+        name: dist-packages-${{ github.sha }}
+        path: dist
+    - uses: actions/upload-artifact@v3
+      with:
         name: pypi-packages-${{ github.sha }}
-        path: |
-          dist
-          pypi
+        path: pypi
 
-    - name: Get PR diff
+    - name: Find chnaged packages
       id: candidate
       run: |
         pip install fire requests
         # python actions/assistant.py list-runtimes $PR_NUMBER
         echo "::set-output name=pkgs::$(python .github/assistant.py determine-releasing-pkgs 2>&1)"
-
     - run: echo "${{ steps.candidate.outputs.pkgs }}"
+
+    - name: Inverse packages to pull
+      id: download
+      run: |
+        pip install fire requests
+        # fixme
+        # python actions/assistant.py list-runtimes $PR_NUMBER
+        echo "::set-output name=pkgs::$(python .github/assistant.py determine-releasing-pkgs 2>&1)"
+    - run: echo "${{ steps.candidate.download.pkgs }}"
 
   # based on https://github.com/pypa/gh-action-pypi-publish
   build-package:
@@ -43,12 +54,13 @@ jobs:
       # run sequential
       max-parallel: 1
       matrix:
-        pkg: ["app", "pytorch"]
+        pkg: ${{ needs.releasing.outputs.build-pkgs }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/download-artifact@v3
       with:
-        name: pypi-packages-${{ github.sha }}
+        name: dist-packages-${{ github.sha }}
+        path: dist
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9
@@ -57,37 +69,55 @@ jobs:
       run: pip install -U setuptools wheel
 
     - name: Build packages
-      if: contains(needs.releasing.outputs.pkgs, matrix.pkg)
+      if: contains(, matrix.pkg)
       env:
         PACKAGE_NAME: ${{ matrix.pkg }}
       run: |
         python setup.py sdist bdist_wheel
         ls -lh dist/
 
-    # Todo: if not building download package
-
     - uses: actions/upload-artifact@v3
       with:
-        name: pypi-packages-${{ github.sha }}
-        path: |
-          dist
-          pypi
+        name: dist-packages-${{ github.sha }}
+        path: dist
 
   # based on https://github.com/pypa/gh-action-pypi-publish
-  build-meta-pkg:
-    needs: build-package
+  pull-package:
+    needs: releasing
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: true
       # run sequential
       max-parallel: 1
       matrix:
-        pkg: ["lightning-app", "pytorch-lightning"]
+        pkg: ${{ needs.releasing.outputs.pull-pkgs }}
     steps:
     - uses: actions/checkout@v2
     - uses: actions/download-artifact@v3
       with:
         name: pypi-packages-${{ github.sha }}
+        path: pypi
+    - uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    # Todo: if not building download package
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: pypi-packages-${{ github.sha }}
+        path: pypi
+
+  # based on https://github.com/pypa/gh-action-pypi-publish
+  build-meta-pkg:
+    needs: build-package,pull-package
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/download-artifact@v3
+      with:
+        name: dist-packages-${{ github.sha }}
+        path: dist
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9
@@ -106,10 +136,8 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
-        name: pypi-packages-${{ github.sha }}
-        path: |
-          dist
-          pypi
+        name: dist-packages-${{ github.sha }}
+        path: dist
 
   upload-package:
     runs-on: ubuntu-20.04
