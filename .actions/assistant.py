@@ -8,7 +8,7 @@ from itertools import chain
 from pathlib import Path
 from pprint import pprint
 from types import ModuleType
-from typing import List, Optional, Sequence
+from typing import List, Sequence
 from urllib.request import Request, urlopen
 
 import fire
@@ -107,7 +107,7 @@ class AssistantCLI:
     @staticmethod
     def determine_releasing_pkgs(
         src_folder: str = _PATH_SRC, packages: Sequence[str] = ("pytorch", "app"), inverse: bool = False
-    ) -> Optional[Sequence[str]]:
+    ) -> Sequence[str]:
         if isinstance(packages, str):
             packages = [packages]
         releasing = [pkg for pkg in packages if AssistantCLI._release_pkg(PACKAGE_MAPPING[pkg], src_folder=src_folder)]

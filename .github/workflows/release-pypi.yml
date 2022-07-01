@@ -35,12 +35,14 @@ jobs:
 
     - name: Find chnaged packages
       id: candidate
-      run: echo "::set-output name=pkgs::$(python .actions/assistant.py determine-releasing-pkgs 2>&1)"
+      run: |
+        echo "::set-output name=pkgs::{include: $(python .actions/assistant.py determine-releasing-pkgs 2>&1)}"
     - run: echo "${{ steps.candidate.outputs.pkgs }}"
 
     - name: Inverse packages to pull
       id: download
-      run: echo "::set-output name=pkgs::$(python .actions/assistant.py determine-releasing-pkgs --inverse 2>&1)"
+      run: |
+        echo "::set-output name=pkgs::{include: $(python .actions/assistant.py determine-releasing-pkgs --inverse 2>&1)}"
     - run: echo "${{ steps.download.outputs.pkgs }}"
 
   # based on https://github.com/pypa/gh-action-pypi-publish
