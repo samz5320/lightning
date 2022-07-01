@@ -31,12 +31,12 @@ jobs:
 
     - name: Find chnaged packages
       id: candidate
-      run: echo "::set-output name=pkgs::$(python .github/assistant.py determine-releasing-pkgs 2>&1)"
+      run: echo "::set-output name=pkgs::$(python .actions/assistant.py determine-releasing-pkgs 2>&1)"
     - run: echo "${{ steps.candidate.outputs.pkgs }}"
 
     - name: Inverse packages to pull
       id: download
-      run: echo "::set-output name=pkgs::$(python .github/assistant.py determine-releasing-pkgs --inverse 2>&1)"
+      run: echo "::set-output name=pkgs::$(python .actions/assistant.py determine-releasing-pkgs --inverse 2>&1)"
     - run: echo "${{ steps.candidate.download.pkgs }}"
 
   # based on https://github.com/pypa/gh-action-pypi-publish
@@ -151,7 +151,7 @@ jobs:
 
   publish-package:
     runs-on: ubuntu-20.04
-    needs: build-package
+    needs: build-meta-pkg
     if: startsWith(github.event.ref, 'refs/tags') || github.event_name == 'release'
     steps:
     - uses: actions/checkout@v2
