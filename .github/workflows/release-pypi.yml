@@ -134,7 +134,7 @@ jobs:
     - name: Unzip packages
       working-directory: pypi
       run: |
-        apt install -y tree
+        sudo apt install -y tree
         tar -zxvf *.tar.gz
         tree . -L 2
 
