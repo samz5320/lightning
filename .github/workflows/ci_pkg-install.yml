@@ -124,6 +124,7 @@ jobs:
           for pkg in 'app' 'pytorch' ; do
             python .actions/assistant.py download-package "$pkg" --folder pypi
           done
+          ls -lh pypi/
 
       - name: Unzip packages
         working-directory: pypi
