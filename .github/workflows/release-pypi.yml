@@ -98,7 +98,8 @@ jobs:
       with:
         python-version: 3.9
 
-    # Todo: if not building download package
+    - name: Dowload package
+      run: python .actions/assistant.py download-package ${{ matrix.pkg }} --folder pypi
 
     - uses: actions/upload-artifact@v3
       with:
@@ -115,6 +116,12 @@ jobs:
       with:
         name: dist-packages-${{ github.sha }}
         path: dist
+    - run: ls -lh dist/
+    - uses: actions/download-artifact@v3
+      with:
+        name: pypi-packages-${{ github.sha }}
+        path: pypi
+    - run: ls -lh pypi/
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9
