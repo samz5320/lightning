@@ -99,7 +99,9 @@ jobs:
         python-version: 3.9
 
     - name: Dowload package
-      run: python .actions/assistant.py download-package ${{ matrix.pkg }} --folder pypi
+      run: |
+        pip install -q fire requests
+        python .actions/assistant.py download-package ${{ matrix.pkg }} --folder pypi
 
     - uses: actions/upload-artifact@v3
       with:
