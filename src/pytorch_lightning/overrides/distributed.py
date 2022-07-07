@@ -20,7 +20,6 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import BatchSampler, Dataset, DistributedSampler, Sampler
 
 from pytorch_lightning.overrides.base import _LightningModuleWrapperBase
-from pytorch_lightning.utilities import rank_zero_deprecation
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
 
