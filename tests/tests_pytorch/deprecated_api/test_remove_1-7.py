@@ -15,10 +15,6 @@
 import os
 from re import escape
 from unittest import mock
-<<<<<<< HEAD
-
-=======
->>>>>>> ade1f855952ac7bd183f1244467a05d58bb00cee
 
 import pytest
 import torch
