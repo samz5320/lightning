@@ -15,7 +15,10 @@
 import os
 from re import escape
 from unittest import mock
+<<<<<<< HEAD
 
+=======
+>>>>>>> ade1f855952ac7bd183f1244467a05d58bb00cee
 
 import pytest
 import torch
@@ -30,27 +33,7 @@ from pytorch_lightning.plugins.environments import (
     TorchElasticEnvironment,
 )
 from pytorch_lightning.strategies import SingleDeviceStrategy
-from tests_pytorch.deprecated_api import _soft_unimport_module
 from tests_pytorch.plugins.environments.test_lsf_environment import _make_rankfile
-
-
-class BoringCallbackDDPSpawnModel(BoringModel):
-    def add_to_queue(self, queue):
-        ...
-
-    def get_from_queue(self, queue):
-        ...
-
-
-def test_v1_7_0_deprecate_add_get_queue(tmpdir):
-    model = BoringCallbackDDPSpawnModel()
-    trainer = Trainer(default_root_dir=tmpdir, fast_dev_run=True)
-
-    with pytest.deprecated_call(match=r"`LightningModule.add_to_queue` method was deprecated in v1.5"):
-        trainer.fit(model)
-
-    with pytest.deprecated_call(match=r"`LightningModule.get_from_queue` method was deprecated in v1.5"):
-        trainer.fit(model)
 
 
 def test_v1_7_0_deprecate_lightning_distributed(tmpdir):
@@ -73,15 +56,6 @@ def test_v1_7_0_deprecate_on_post_move_to_device(tmpdir):
         match=r"Method `on_post_move_to_device` has been deprecated in v1.5 and will be removed in v1.7"
     ):
         trainer.fit(model)
-
-
-def test_v1_7_0_deprecate_parameter_validation():
-
-    _soft_unimport_module("pytorch_lightning.core.decorators")
-    with pytest.deprecated_call(
-        match="Using `pytorch_lightning.core.decorators.parameter_validation` is deprecated in v1.5"
-    ):
-        from pytorch_lightning.core.decorators import parameter_validation  # noqa: F401
 
 
 def test_v1_7_0_deprecated_slurm_job_id():
@@ -174,6 +148,7 @@ def test_v1_7_0_cluster_environment_detection(cls, method_name, tmp_path):
                 match=f"MyClusterEnvironment.{method_name}` has been deprecated in v1.6 and will be removed in v1.7"
             ):
                 MyClusterEnvironment()
+
 
 def test_v1_7_0_post_dispatch_hook():
     class CustomPlugin(SingleDeviceStrategy):
